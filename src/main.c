@@ -1,4 +1,5 @@
 const int BOARD_SIZE = 8;
+string board [BOARD_SIZE][BOARD_SIZE];
 
 // sensor configuration
 
@@ -20,7 +21,7 @@ const int BOARD_SIZE = 8;
 // replay the game
 
 // execute move fucntion
-void movePeice(int x1, int y1, int x2, int y2, string* board)
+void movePeice(int x1, int y1, int x2, int y2)
 {
 	displayString(1, "owen");
 	return;
@@ -30,7 +31,7 @@ void movePeice(int x1, int y1, int x2, int y2, string* board)
 // place peice
 // update game board
 
-void boardInitState(string* board[BOARD_SIZE][BOARD_SIZE])
+void boardInitState()
 {
   for (int row = 0; row < BOARD_SIZE; row++)
   {
@@ -81,16 +82,17 @@ void boardInitState(string* board[BOARD_SIZE][BOARD_SIZE])
     }
   }
 
-  return;
+  //return;
 }
 
 task main()
 {
 	// 2d array with the board location
 	// bk, wk, k, q, b, r, p, n for knight
-	string board[BOARD_SIZE][BOARD_SIZE];
 
-  boardInitState(board);
+	//string board[BOARD_SIZE][BOARD_SIZE];
+
+  boardInitState();
 
 	// pass by reference to functions
 
