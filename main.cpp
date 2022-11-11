@@ -5,6 +5,8 @@
 
 using namespace std;
 
+//Cloud Integration Assembly Test
+
 
 const int BOARD_SIZE = 8;
 
