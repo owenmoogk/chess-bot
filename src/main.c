@@ -61,8 +61,6 @@ void getInput(int &currentLetter, int &currentNumber)
 
 // zeroing function
 
-// lower claw and pick up peice
-
 // move to cell
 	// calculate distance to cell
 	// move x axis
@@ -74,11 +72,12 @@ void getInput(int &currentLetter, int &currentNumber)
 
 // replay the game
 
+// picking up the peice when the claw is in place
 void pickUpPeice()
 {
-	nMotorEncoder[CLAWACTUATIONMOTOR] = 0
+	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = 10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < clawLowerClicks)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWMOTOR] = 10;
@@ -87,15 +86,16 @@ void pickUpPeice()
 	// this can be fine tuned later
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = -10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < clawLowerClicks)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 }
 
+// putting down the peice when the claw is in place
 void putDownPeice()
 {
-	nMotorEncoder[CLAWACTUATIONMOTOR] = 0
+	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = 10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < clawLowerClicks)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWMOTOR] = -10;
@@ -103,7 +103,7 @@ void putDownPeice()
 	motor[CLAWMOTOR] = 0;
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = -10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < clawLowerClicks)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 }
 // execute move fucntion
