@@ -4,7 +4,18 @@ const int BOARD_SIZE = 8;
 // bk, wk, k, q, b, r, p, n for knight
 string board[BOARD_SIZE][BOARD_SIZE];
 
+int touch = S1;
+int color = S2;
+
 // sensor configuration
+void configureSensors()
+{
+	SensorType[touch] = sensorEV3_Touch;
+	SensorType[color] = sensorEV3_Color;
+	wait1Msec(50);
+	SensorMode[color] = modeEV3Color_Color;
+	wait1Msec(50);
+}
 
 // function to get input
 // returns current letter and number by pbr
@@ -118,5 +129,6 @@ void boardInitState()
 
 task main()
 {
-  boardInitState();
+	configureSensors();
+	boardInitState();
 }
