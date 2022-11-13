@@ -172,4 +172,15 @@ task main()
 {
 	configureSensors();
 	boardInitState();
+
+	// while loop
+	// keep track of turn (probably boolean is fine)
+	// prompt for move
+	// move to position
+	// pick up
+	// move to position
+	// place
+	// move to zero?
+	// back to top of while loop
+	// exit when the user says so..? don't think we can check for checkmates soooo.....
 }
