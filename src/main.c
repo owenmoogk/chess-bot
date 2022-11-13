@@ -4,6 +4,37 @@ string board [BOARD_SIZE][BOARD_SIZE];
 // sensor configuration
 
 // function to get input
+// returns current letter and number by pbr
+void getInput(int &currentLetter, int &currentNumber)
+{
+	// ascii
+	currentLetter = 65;
+	currentNumber = 1;
+	while (true)
+	{
+		while (!getButtonPress(buttonAny))
+		{ }
+
+		if (getButtonPress(buttonEnter)) return;
+
+		if (getButtonPress(buttonLeft)) currentLetter -= 1;
+		if (getButtonPress(buttonRight)) currentLetter += 1;
+		if (getButtonPress(buttonUp)) currentNumber += 1;
+		if (getButtonPress(buttonDown)) currentNumber -= 1;
+		while (getButtonPress(buttonAny))
+		{ }
+
+		// wrapping around the board
+		// ie, if you start at 1 and hit back, it will go to position 8
+		if (currentLetter < 65) currentLetter = 72;
+		if (currentLetter > 72) currentLetter = 65;
+		if (currentNumber < 1) currentNumber = 8;
+		if (currentNumber > 8) currentNumber = 1;
+
+		// will have to test if this ascii casting works
+		displayString(2, "Current Position: %c%i", currentLetter, currentNumber);
+	}
+}
 
 // zeroing function
 
