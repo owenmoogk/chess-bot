@@ -1,5 +1,8 @@
 const int BOARD_SIZE = 8;
-string board [BOARD_SIZE][BOARD_SIZE];
+
+// 2d array with the board location
+// bk, wk, k, q, b, r, p, n for knight
+string board[BOARD_SIZE][BOARD_SIZE];
 
 // sensor configuration
 
@@ -54,8 +57,7 @@ void getInput(int &currentLetter, int &currentNumber)
 // execute move fucntion
 void movePeice(int x1, int y1, int x2, int y2)
 {
-	displayString(1, "owen");
-	return;
+
 }
 // moves to cell
 // pick up peice
@@ -112,19 +114,9 @@ void boardInitState()
       board[row][col] = value;
     }
   }
-
-  //return;
 }
 
 task main()
 {
-	// 2d array with the board location
-	// bk, wk, k, q, b, r, p, n for knight
-
-	//string board[BOARD_SIZE][BOARD_SIZE];
-
   boardInitState();
-
-	// pass by reference to functions
-
 }
