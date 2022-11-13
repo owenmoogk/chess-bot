@@ -74,6 +74,38 @@ void getInput(int &currentLetter, int &currentNumber)
 
 // replay the game
 
+void pickUpPeice()
+{
+	nMotorEncoder[CLAWACTUATIONMOTOR] = 0
+	motor[CLAWACTUATIONMOTOR] = 10;
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < clawLowerClicks)
+	{ }
+	motor[CLAWACTUATIONMOTOR] = 0;
+	motor[CLAWMOTOR] = 10;
+	wait1Msec(CLAWWAITTIME * 1.5);
+	// note, the motor is being left on to make sure the peice is always secured in the claw
+	// this can be fine tuned later
+	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
+	motor[CLAWACTUATIONMOTOR] = -10;
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < clawLowerClicks)
+	{ }
+}
+
+void putDownPeice()
+{
+	nMotorEncoder[CLAWACTUATIONMOTOR] = 0
+	motor[CLAWACTUATIONMOTOR] = 10;
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < clawLowerClicks)
+	{ }
+	motor[CLAWACTUATIONMOTOR] = 0;
+	motor[CLAWMOTOR] = -10;
+	wait1Msec(CLAWWAITTIME);
+	motor[CLAWMOTOR] = 0;
+	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
+	motor[CLAWACTUATIONMOTOR] = -10;
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < clawLowerClicks)
+	{ }
+}
 // execute move fucntion
 void movePeice(int x1, int y1, int x2, int y2)
 {
