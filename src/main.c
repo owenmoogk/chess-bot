@@ -4,16 +4,25 @@ const int BOARD_SIZE = 8;
 // bk, wk, k, q, b, r, p, n for knight
 string board[BOARD_SIZE][BOARD_SIZE];
 
-int touch = S1;
-int color = S2;
+const int TOUCH = S1;
+const int COLOR = S2;
+
+const int XMOTOR = motorA;
+const int YMOTOR = motorB;
+const int CLAWACTUATIONMOTOR = motorC;
+const int CLAWMOTOR = motorD;
+
+const int CLAWLOWERCLICKS = 100;
+// time to wait until the claw has fully secured the peice
+const int CLAWWAITTIME = 100; // ms
 
 // sensor configuration
 void configureSensors()
 {
-	SensorType[touch] = sensorEV3_Touch;
-	SensorType[color] = sensorEV3_Color;
+	SensorType[TOUCH] = sensorEV3_Touch;
+	SensorType[COLOR] = sensorEV3_Color;
 	wait1Msec(50);
-	SensorMode[color] = modeEV3Color_Color;
+	SensorMode[COLOR] = modeEV3Color_Color;
 	wait1Msec(50);
 }
 
