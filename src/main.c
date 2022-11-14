@@ -19,7 +19,7 @@ const int CLAWMOTOR = motorD;
 
 const int CLAWLOWERCLICKS = 100;
 // time to wait until the claw has fully secured the peice
-const int CLAWWAITTIME = 100; // ms
+const int CLAWWAITTIME = 100; // milliseconds
 
 const int ENDX = 9;
 const int ENDY = 9;
