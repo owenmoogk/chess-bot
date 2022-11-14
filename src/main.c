@@ -90,6 +90,11 @@ void moveToCell(int currX, int currY, int x, int y)
 	// calculate distance to cell
 	// move x axis
 	// move z axis
+	
+	int travelX = currX - x;
+	int travelY = currY - y;
+	
+	
 }
 
 // file input
@@ -214,6 +219,12 @@ void boardInitState()
       board[row][col] = value;
     }
   }
+}
+
+// complete this later
+void shutDownProcedure()
+{
+	// hi
 }
 
 task main()
