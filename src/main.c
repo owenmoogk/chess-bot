@@ -4,6 +4,10 @@ const int BOARD_SIZE = 8;
 // bk, wk, k, q, b, r, p, n for knight
 string board[BOARD_SIZE][BOARD_SIZE];
 
+// HUGE ASSUMPTION:
+// on startup, the y-axis (pulley) MUST be at the same point (probably zero)
+// otherwise we have to change the init function, I don't think we'll have a touch sensor there to 'zero'
+
 const int TOUCH = S1;
 const int COLOR = S2;
 const int XZEROTOUCH = S3;
@@ -16,6 +20,9 @@ const int CLAWMOTOR = motorD;
 const int CLAWLOWERCLICKS = 100;
 // time to wait until the claw has fully secured the peice
 const int CLAWWAITTIME = 100; // ms
+
+const int ENDX = 9;
+const int ENDY = 9;
 
 // sensor configuration
 void configureSensors()
@@ -77,9 +84,13 @@ void zero()
 }
 
 // move to cell
+void moveToCell(int currX, int currY, int x, int y)
+{
+	// too much thinking rn
 	// calculate distance to cell
 	// move x axis
 	// move z axis
+}
 
 // file input
 
@@ -122,14 +133,34 @@ void putDownPeice()
 	{ }
 }
 // execute move fucntion
-void movePeice(int x1, int y1, int x2, int y2)
+bool movePeice(int x1, int y1, int x2, int y2)
 {
-
+	// if endpos same as start pos, or color already obtains the destination cell, move is invalid
+	if ((x1 == x2 && y1 == y2) || (stringFind(board[x2][y2], "W") == stringFind(board[x1][y1], "W")))
+	{
+		return false;
+	}
+	// if the board has another peice here
+	if (board[x2][y2] != "")
+	{
+		moveToCell(0,0,x2,y2);
+		pickUpPeice();
+		moveToCell(x2,y2,ENDX,ENDY);
+		putDownPeice();
+		moveToCell(ENDX, ENDY, x1, y1);
+	}
+	else
+	{
+		moveToCell(0,0,x1,y1);
+	}
+	pickUpPeice();
+	moveToCell(x1,y1,x2,y2);
+	putDownPeice();
+	// have to check for legal move here
+	board[x2][y2] = board[x1][y1];
+	board[x1][y1] = "";
+	zero();
 }
-// moves to cell
-// pick up peice
-// place peice
-// update game board
 
 void boardInitState()
 {
