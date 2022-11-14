@@ -6,6 +6,7 @@ string board[BOARD_SIZE][BOARD_SIZE];
 
 const int TOUCH = S1;
 const int COLOR = S2;
+const int XZEROTOUCH = S3;
 
 const int XMOTOR = motorA;
 const int YMOTOR = motorB;
@@ -24,6 +25,7 @@ void configureSensors()
 	wait1Msec(50);
 	SensorMode[COLOR] = modeEV3Color_Color;
 	wait1Msec(50);
+	nMotorEncoder[YMOTOR] = 0;
 }
 
 // function to get input
@@ -60,6 +62,19 @@ void getInput(int &currentLetter, int &currentNumber)
 }
 
 // zeroing function
+void zero()
+{
+	motor[XMOTOR] = -10;
+	while (!SensorValue[XZEROTOUCH])
+	{	}
+	motor[XMOTOR] = 0;
+
+	// assuming (-) is 'backwards' towards the 'zero point'
+	motor[YMOTOR] = -10;
+	while (nMotorEncoder[YMOTOR] > 0)
+	{ }
+	motor[YMOTOR] = 0;
+}
 
 // move to cell
 	// calculate distance to cell
