@@ -28,6 +28,7 @@ const int ENDY = 9;
 void configureSensors()
 {
 	SensorType[TOUCH] = sensorEV3_Touch;
+	wait1Msec(50);
 	SensorType[COLOR] = sensorEV3_Color;
 	wait1Msec(50);
 	SensorMode[COLOR] = modeEV3Color_Color;
@@ -84,18 +85,31 @@ void zero()
 }
 
 // move to cell
+
+/*
+Eidan:
+I think we should have a few functions that relate to moving to a cell.
+One function will be a void function and all it will do it move across the X-axis EXACTLY one cell.
+On finction will be a void funciton that will move the Y-AXis pully EXACTLY one cell.
+These functions would take in a bool (0/1). 0 means forwards/positive, 1 means reverse/negative.
+
+Then the moveing funciton will take in the current (x,y) and the desired (x,y) position,
+and call the x/y movement funcitons a certain number of times with the specific direction (0/1).
+
+*/
 void moveToCell(int currX, int currY, int x, int y)
 {
 	// too much thinking rn
 	// calculate distance to cell
 	// move x axis
 	// move z axis
-	
+
 	int travelX = currX - x;
 	int travelY = currY - y;
-	
-	
+
 }
+
+//Function for when there is a piece that needs to be taken, etc..
 
 // file input
 
