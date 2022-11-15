@@ -1,4 +1,4 @@
-#include "PC_FileIO.c"
+// #include "PC_FileIO.c"
 
 const int BOARD_SIZE = 8;
 
@@ -40,6 +40,7 @@ void configureSensors()
 
 // function to get input
 // returns current letter and number by pbr
+/*
 int getFileLength (TFileHandle &FileIn)
 {
 	int counter = 0;
@@ -69,8 +70,9 @@ void getFileInput (TFileHandle &FileIn, string initialColumn[], int initialRow[]
 	{
 		counter++;
 	}
-
 }
+*/
+
 void getInput(int &currentLetter, int &currentNumber)
 {
 	// ascii
