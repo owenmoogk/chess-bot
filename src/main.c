@@ -1,3 +1,5 @@
+#include "PC_FileIO.c"
+
 const int BOARD_SIZE = 8;
 
 // 2d array with the board location
@@ -38,6 +40,37 @@ void configureSensors()
 
 // function to get input
 // returns current letter and number by pbr
+int getFileLength (TFileHandle &FileIn)
+{
+	int counter = 0;
+	char input = '';
+	int inputNum = 0;
+	bool check = true;
+	do
+	{
+		check = readCharPC(FileIn, input);
+		bool check1 = readIntPC (FileIn, inputNum);
+		bool check2 = readCharPC(FileIn, input);
+		bool check3 = readIntPC (FileIn, inputNum);
+		counter++;
+	}while(check);
+
+	return counter;
+}
+
+void getFileInput (TFileHandle &FileIn, string initialColumn[], int initialRow[], string finalColumn[], int finalRow[])
+{
+
+	int counter = 0;
+	while(readTextPC(FileIn, initialColumn[counter])
+				readIntPC (FileIn, initialRow[counter])
+				readTextPC(FileIn, finalCoulmn[counter])
+				readIntPC (FileIn, finalRow[counter]))
+	{
+		counter++;
+	}
+
+}
 void getInput(int &currentLetter, int &currentNumber)
 {
 	// ascii
@@ -103,36 +136,36 @@ void moveToCell(int currX, int currY, int x, int y)
 	// calculate distance to cell
 	// move x axis
 	// move z axis
-	
+
 	// some of this is pseudocode because im tired, this probably wont work
 	int colorCount = 0;
 	int travelX = currX - x;
 	int travelY = currY - y;
 	bool directionX = false;
 	bool directionY = false;
-	
+
 	if (travelX < 0)
 	{
 		directionX = true;
 	}
-	
+
 	if (travelY < 0)
 	{
 		directionY = true;
 	}
-	
+
 	for (int count = 0; count < travelX; count++)
 	{
 		motor[XMOTOR] = motorPowerX - (2*motorPower*(directionX*-1)); //bool direction - true is moving backwards, false is forwards
-		
+
 		while(COLOR != red)
 		{}
 	}
-	
+
 	for (int count = 0; count < travelY; count++)
 	{
 		motor[YMOTOR] = motorPowerY - (2*motorPower*(directionY*-1));
-		
+
 		while(COLOR != red)
 		{}
 	}
@@ -275,6 +308,47 @@ task main()
 	configureSensors();
 	boardInitState();
 
+	// """""""""UI""""""""
+
+	bool playing = true;
+	int gameMode = 0;
+
+	while(playing)
+	{
+		displayString( 2,"Choose Game Mode");
+		displayString( 4,"Play Mode (Press UP)");
+		displayString( 5,"Review Mode (Press DOWN)");
+
+		if(getButtonPress(buttonUp))
+			gameMode = 0
+		else if(getButtonPress(buttonDown))
+			gameMode = 1;
+
+		if(getButtonPress(buttonEnter))
+			palying = false;
+	}
+
+	eraseDisplay();
+
+
+	// Open FIle
+	// TFileHandle FileIn;
+	// openReadPC (FileIn, "*FileName*");
+
+	// Get File Length
+	// int length = getFileLength (FileIn);
+
+	// Make arrays
+	// string initialColumn[length];
+	// int initialRow[length];
+	// string finalColumn[length];
+	// int finalRow[length];
+
+
+	// close and open file again to read
+	// closeFilePC (FileIn);
+	// openReadPC (FileIn, "*FileName*");
+
 	// while loop
 	// keep track of turn (probably boolean is fine)
 	// prompt for move
@@ -284,5 +358,7 @@ task main()
 	// place
 	// move to zero?
 	// back to top of while loop
+
+	// Close File closeFilePC (FileIn);
 	// exit when the user says so..? don't think we can check for checkmates soooo.....
 }
