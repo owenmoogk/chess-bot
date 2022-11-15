@@ -103,10 +103,39 @@ void moveToCell(int currX, int currY, int x, int y)
 	// calculate distance to cell
 	// move x axis
 	// move z axis
-
+	
+	// some of this is pseudocode because im tired, this probably wont work
+	int colorCount = 0;
 	int travelX = currX - x;
 	int travelY = currY - y;
-
+	bool directionX = false;
+	bool directionY = false;
+	
+	if (travelX < 0)
+	{
+		directionX = true;
+	}
+	
+	if (travelY < 0)
+	{
+		directionY = true;
+	}
+	
+	for (int count = 0; count < travelX; count++)
+	{
+		motor[XMOTOR] = motorPowerX - (2*motorPower*(directionX*-1)); //bool direction - true is moving backwards, false is forwards
+		
+		while(COLOR != red)
+		{}
+	}
+	
+	for (int count = 0; count < travelY; count++)
+	{
+		motor[YMOTOR] = motorPowerY - (2*motorPower*(directionY*-1));
+		
+		while(COLOR != red)
+		{}
+	}
 }
 
 //Function for when there is a piece that needs to be taken, etc..
