@@ -206,6 +206,7 @@ void pickUpPeice()
 	motor[CLAWACTUATIONMOTOR] = -10;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
+	motor[CLAWACTUATIONMOTOR] = 0;
 }
 
 // putting down the peice when the claw is in place
@@ -223,6 +224,7 @@ void putDownPeice()
 	motor[CLAWACTUATIONMOTOR] = -10;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
+	motor[CLAWACTUATIONMOTOR] = 0;
 }
 
 
@@ -315,12 +317,12 @@ task main()
 		displayString( 5,"Review Mode (Press DOWN)");
 
 		if(getButtonPress(buttonUp))
-			gameMode = 0
+			gameMode = 0;
 		else if(getButtonPress(buttonDown))
 			gameMode = 1;
 
 		if(getButtonPress(buttonEnter))
-			palying = false;
+			playing = false;
 	}
 
 	eraseDisplay();
