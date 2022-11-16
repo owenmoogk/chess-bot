@@ -1,10 +1,10 @@
 /**********************************************************************
 Filename: PC_FileIO.c
-Date: November 7, 2016
-File Version: 1.2
+Date: October 19, 2018
+File Version: 1.5
 
 ASCII conversion functions so that files read or written on a PC can be
-used on the Lego NXT or EV3 bricks.  Whitespace (space, tab, enter) is needed
+used on the Lego EV3 or NXT bricks.  Whitespace (space, tab, enter) is needed
 between values.
 
 The functions available are:
@@ -25,6 +25,9 @@ bool readFloatPC(TFileHandle & fin, float & number);
 
 History
 Ver  Date       Comment
+1.5  Oct 19/18  output text one character at a time to remove null terminator on the string
+1.4  Nov 16/17  corrected release condition of having test main available
+1.3  Nov  5/17  if platform is not specified, default is now EV3
 1.2  Nov  7/16  file status is now returned as a bool; added EV3 functionality;
                 flag is used to select between NXT functions and EV3; added
                 test program to be part of file
@@ -36,9 +39,9 @@ Ver  Date       Comment
 #ifndef PC_FILEIO
 #define PC_FILEIO
 
-// if platform is not specified, default is NXT
+// if platform is not specified, default is EV3
 #ifndef _EV3FILEIO
-#define _EV3FILEIO 0
+#define _EV3FILEIO 1
 #endif
 
 #define _MAIN_PCFILEIO 0  // 1 for test main program, 0 for use in other programs
@@ -116,12 +119,15 @@ bool writeEndlPC(TFileHandle & fout)
     return statusOK;
 }
 
-bool writeTextPC(TFileHandle & fout, string const & textmsg)
+bool writeTextPC(TFileHandle & fout, char* textmsg)
 {
     TFileIOResult status = _IO_OKAY;
 #if _EV3FILEIO
-    int msglen = strlen(textmsg) + 1;  // add 1 to include the zero terminator
-    status = fileWriteData(fout, textmsg, msglen);
+//    int msglen = strlen(textmsg) + 1;  // add 1 to include the zero terminator
+//    status = fileWriteData(fout, textmsg, msglen);
+    int msglen = strlen(textmsg);
+    for (int charCount = 0; charCount < msglen; charCount++)
+        writeCharPC(fout, textmsg[charCount]);
 #else
     WriteText(fout, status, textmsg);
 #endif
