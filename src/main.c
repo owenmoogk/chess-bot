@@ -17,6 +17,8 @@ const int XZEROTOUCH = S3;
 
 const int XMOTOR = motorA;
 const int YMOTOR = motorB;
+const int XMOTORPOWER = 50;
+const int YMOTORPOWER = 50;
 
 const int CLAWACTUATIONMOTOR = motorC;
 const int CLAWMOTOR = S1;
@@ -135,21 +137,16 @@ void zero()
 // move to cell
 void moveToCell(int currX, int currY, int x, int y)
 {
-	int colorCount = 0;
-	int travelX = currX - x;
-	int travelY = currY - y;
-	bool directionX = false;
-	bool directionY = false;
+	int travelX = x - currX;
+	int travelY = y - currY;
+	int directionX = -1;
+	int directionY = 1;
 
 	if (travelX < 0)
-	{
-		directionX = true;
-	}
+		directionX *= -1;
 
 	if (travelY < 0)
-	{
-		directionY = true;
-	}
+		directionY *= -1;
 
 	for (int count = 0; count < travelX; count++)
 	{
