@@ -87,6 +87,7 @@ void getInput(int &currentLetter, int &currentNumber)
 	// ascii
 	currentLetter = 65;
 	currentNumber = 1;
+	displayString(1, "in function");
 	while (true)
 	{
 		while (!getButtonPress(buttonAny))
@@ -117,7 +118,7 @@ void getInput(int &currentLetter, int &currentNumber)
 			currentNumber = 1;
 
 		// will have to test if this ascii casting works
-		displayString(2, "Current Position: %c%i", currentLetter, currentNumber);
+		displayString(2, "Current Position: %c%d", currentLetter, currentNumber);
 	}
 }
 
@@ -301,15 +302,17 @@ task main()
 		else
 			displayBigTextLine(5, "Play Game");
 
-		if(getButtonPress(buttonUp) || getButtonPress(buttonDown)
+		if(getButtonPress(buttonUp) || getButtonPress(buttonDown))
 		{
 			reviewGame = !reviewGame;
-			while(getButtonPress(buttonUp) || getButtonPress(buttonDown)
+			while(getButtonPress(buttonUp) || getButtonPress(buttonDown))
 			{ }
 		}
 
 		if(getButtonPress(buttonEnter))
 			playing = false;
+			while(getButtonPress(buttonEnter)
+			{}
 	}
 
 	eraseDisplay();
@@ -317,29 +320,36 @@ task main()
 	if (reviewGame)
 	{
 		// Open FIle
-	// TFileHandle FileIn;
-	// openReadPC (FileIn, "*FileName*");
+		// TFileHandle FileIn;
+		// openReadPC (FileIn, "*FileName*");
 
-	// Get File Length
-	// int length = getFileLength (FileIn);
+		// Get File Length
+		// int length = getFileLength (FileIn);
 		// closeFilePC (FileIn);
-	// openReadPC (FileIn, "*FileName*");
+		// openReadPC (FileIn, "*FileName*");
 
-	// Make arrays
-	// string initialColumn[length];
-	// int initialRow[length];
-	// string finalColumn[length];
-	// int finalRow[length];
+		// Make arrays
+		// string initialColumn[length];
+		// int initialRow[length];
+		// string finalColumn[length];
+		// int finalRow[length];
 
-	// get file input
+		// get file input
 
-	// Close File closeFilePC (FileIn);
+		// Close File closeFilePC (FileIn);
 	}
 	else
 	{
-		// while loop
+		playing = true;
+		bool whiteTurn = true;
+		while(playing)
+		{
+			int currentLetter;
+			int currentNumber;
+			getInput(currentLetter, currentNumber);
+			playing = false;
+		}
 		// keep track of turn (probably boolean is fine)
-		// prompt for move
 		// move to position
 		// pick up
 		// move to position
