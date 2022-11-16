@@ -1,4 +1,5 @@
 // #include "PC_FileIO.c"
+#include "EV3Servo-lib-UW.c"
 
 const int BOARD_SIZE = 8;
 
@@ -16,12 +17,14 @@ const int XZEROTOUCH = S3;
 
 const int XMOTOR = motorA;
 const int YMOTOR = motorB;
-const int CLAWACTUATIONMOTOR = motorC;
-const int CLAWMOTOR = motorD;
 
-const int CLAWLOWERCLICKS = 100;
-// time to wait until the claw has fully secured the peice
-const int CLAWWAITTIME = 100; // milliseconds
+const int CLAWACTUATIONMOTOR = motorC;
+const int CLAWMOTOR = S1;
+const int CLAWCLOSE = 10;
+const int CLAWOPEN = 70;
+const int CLAWWAITTIME = 100;
+const int CLAWLOWERCLICKS = 360;
+const int SV_GRIPPER = 4;
 
 const int ENDX = 9;
 const int ENDY = 9;
@@ -198,10 +201,8 @@ void pickUpPeice()
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWMOTOR] = 10;
-	wait1Msec(CLAWWAITTIME * 1.5);
-	// note, the motor is being left on to make sure the peice is always secured in the claw
-	// this can be fine tuned later
+	setGripperPosition(CLAWMOTOR,SV_GRIPPER,CLAWCLOSE);
+	wait1Msec(CLAWWAITTIME);
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = -10;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
@@ -217,9 +218,8 @@ void putDownPeice()
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWMOTOR] = -10;
+	setGripperPosition(CLAWMOTOR, SV_GRIPPER, CLAWOPEN);
 	wait1Msec(CLAWWAITTIME);
-	motor[CLAWMOTOR] = 0;
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = -10;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
