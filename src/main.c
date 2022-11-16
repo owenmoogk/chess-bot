@@ -290,18 +290,23 @@ task main()
 	// UI
 
 	bool playing = true;
-	int gameMode = 0;
+	bool reviewGame = false;
 
 	while(playing)
 	{
-		displayString( 2,"Choose Game Mode");
-		displayString( 4,"Play Mode (Press UP)");
-		displayString( 5,"Review Mode (Press DOWN)");
+		displayBigTextLine(1,"Game Mode");
+		displayString(3,"Toggle with UP/DOWN");
+		if(reviewGame)
+			displayBigTextLine(5, "Review Game");
+		else
+			displayBigTextLine(5, "Play Game");
 
-		if(getButtonPress(buttonUp))
-			gameMode = 0;
-		else if(getButtonPress(buttonDown))
-			gameMode = 1;
+		if(getButtonPress(buttonUp) || getButtonPress(buttonDown)
+		{
+			reviewGame = !reviewGame;
+			while(getButtonPress(buttonUp) || getButtonPress(buttonDown)
+			{ }
+		}
 
 		if(getButtonPress(buttonEnter))
 			playing = false;
