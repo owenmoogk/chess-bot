@@ -17,12 +17,8 @@ const int XZEROTOUCH = S3;
 
 const int XMOTOR = motorA;
 const int YMOTOR = motorB;
-const int XMOTORPOWER = 10;
-const int YMOTORPOWER = 10;
-const int MOTORPOWER = 10;
-
-//The motor encoder value for 1 cell movement in the y-axis
-const int yCellEncoder = 360; //NEEDS TO BE MEASURED
+const int XMOTORPOWER = 50;
+const int YMOTORPOWER = 50;
 
 const int CLAWACTUATIONMOTOR = motorC;
 const int CLAWMOTOR = S1;
@@ -35,9 +31,6 @@ const int SV_GRIPPER = 4;
 // where the taken peices go
 const int ENDX = 9;
 const int ENDY = 9;
-
-//Colour Sensor
-const int RED = (int) colorRed;
 
 // sensor configuration
 void configureSensors()
@@ -56,33 +49,33 @@ void configureSensors()
 /*
 int getFileLength (TFileHandle &FileIn)
 {
-int counter = 0;
-char input = '';
-int inputNum = 0;
-bool check = true;
-do
-{
-check = readCharPC(FileIn, input);
-bool check1 = readIntPC (FileIn, inputNum);
-bool check2 = readCharPC(FileIn, input);
-bool check3 = readIntPC (FileIn, inputNum);
-counter++;
-}while(check);
+	int counter = 0;
+	char input = '';
+	int inputNum = 0;
+	bool check = true;
+	do
+	{
+		check = readCharPC(FileIn, input);
+		bool check1 = readIntPC (FileIn, inputNum);
+		bool check2 = readCharPC(FileIn, input);
+		bool check3 = readIntPC (FileIn, inputNum);
+		counter++;
+	}while(check);
 
-return counter;
+	return counter;
 }
 
 void getFileInput (TFileHandle &FileIn, string initialColumn[], int initialRow[], string finalColumn[], int finalRow[])
 {
 
-int counter = 0;
-while(readTextPC(FileIn, initialColumn[counter])
-readIntPC (FileIn, initialRow[counter])
-readTextPC(FileIn, finalCoulmn[counter])
-readIntPC (FileIn, finalRow[counter]))
-{
-counter++;
-}
+	int counter = 0;
+	while(readTextPC(FileIn, initialColumn[counter])
+				readIntPC (FileIn, initialRow[counter])
+				readTextPC(FileIn, finalCoulmn[counter])
+				readIntPC (FileIn, finalRow[counter]))
+	{
+		counter++;
+	}
 }
 */
 
@@ -141,115 +134,38 @@ void zero()
 	motor[YMOTOR] = 0;
 }
 
-/*
 // move to cell
 void moveToCell(int currX, int currY, int x, int y)
 {
-int travelX = x - currX;
-int travelY = y - currY;
-int directionX = -1;
-int directionY = 1;
+	int travelX = x - currX;
+	int travelY = y - currY;
+	int directionX = -1;
+	int directionY = 1;
 
-if (travelX < 0)
-directionX *= -1;
+	if (travelX < 0)
+		directionX *= -1;
 
-if (travelY < 0)
-directionY *= -1;
+	if (travelY < 0)
+		directionY *= -1;
 
-for (int count = 0; count < travelX; count++)
-{
-motor[XMOTOR] = XMOTORPOWER * directionX;
-// need to figure this out
-// while(SensorValue(COLOR) != color.RED)
-// {}
-}
-
-for (int count = 0; count < travelY; count++)
-{
-motor[YMOTOR] = YMOTORPOWER * directionY;
-// need to figure this out
-// while(COLOR != red)
-// {}
-}
-}
-*/
-
-void moveToCell (int xPos, int yPos)
-{
-	//xPos is controlled through colour sensor values
-	int xCellNum = 0;
-	motor[XMOTOR] = MOTORPOWER;
-	while (xCellNum < xPos)
+	for (int count = 0; count < travelX; count++)
 	{
-		while (SensorValue[COLOR] != RED)
-		{ }
-		xCellNum++;
-	}
-	motor[XMOTOR] = 0;
-
-
-	//yPos is controlled through Motor Encoder Values
-	//Need to know the motor encoder value to move 1 cell
-
-	int yEncoderPos = yPos*yCellEncoder;
-	motor[YMOTOR] = MOTORPOWER;
-	while (nMotorEncoder[YMOTOR] < yEncoderPos)
-	{ }
-	motor[YMOTOR] = 0;
-}
-
-void movePos (int x1, int y1, int x2, int y2)
-{
-	int xPos = x2-x1;
-	int yPos = y2-y1;
-
-	//Default direction is +
-	int xDir = 1;
-	int yDir = 1;
-
-
-	//If need to go to a cell that is "behind"
-	//Switch direction and set coordinate position to positive value
-	if (xPos < 0)
-	{
-		xDir*=-1;
-		xPos*=-1;
-	}
-	if (yPos < 0)
-	{
-		yDir *= -1;
-		yPos *= -1;
+		motor[XMOTOR] = XMOTORPOWER * directionX;
+		// need to figure this out
+		// while(SensorValue(COLOR) != color.RED)
+		// {}
 	}
 
-
-	int xCellNum = 0;
-	motor[XMOTOR] = xDir*MOTORPOWER;
-	while (xCellNum < xPos)
+	for (int count = 0; count < travelY; count++)
 	{
-		while (SensorValue[COLOR] != RED)
-		{ }
-		xCellNum++;
+		motor[YMOTOR] = YMOTORPOWER * directionY;
+		// need to figure this out
+		// while(COLOR != red)
+		// {}
 	}
-	motor[XMOTOR] = 0;
-
-
-	//yPos is controlled through Motor Encoder Values
-	//Need to know the motor encoder value to move 1 cell
-	int yEncoderPos = yDir*yPos*yCellEncoder;
-	motor[YMOTOR] = yDir*MOTORPOWER;
-	while (nMotorEncoder[YMOTOR] < yEncoderPos)
-	{ }
-	motor[YMOTOR] = 0;
-
 }
-
-
 
 //Function for when there is a piece that needs to be taken, etc..
-void capturePiece (int xPos, int yPos)
-{
-
-}
 
 // file input
 
@@ -303,19 +219,18 @@ bool movePeice(int x1, int y1, int x2, int y2)
 	// if the board has another peice here
 	if (board[x2][y2] != "")
 	{
-		moveToCell(x2,y2);
+		moveToCell(0,0,x2,y2);
 		pickUpPeice();
-		movePos(x2, y2,ENDX,ENDY);
+		moveToCell(x2,y2,ENDX,ENDY);
 		putDownPeice();
-		zero();
-		moveToCell(x1, y1);
+		moveToCell(ENDX, ENDY, x1, y1);
 	}
 	else
 	{
-		moveToCell(x1,y1);
+		moveToCell(0,0,x1,y1);
 	}
 	pickUpPeice();
-	movePos(x1,y1,x2,y2);
+	moveToCell(x1,y1,x2,y2);
 	putDownPeice();
 	// have to check for legal move here
 	board[x2][y2] = board[x1][y1];
@@ -327,37 +242,37 @@ bool movePeice(int x1, int y1, int x2, int y2)
 
 void boardInitState()
 {
-	for (int row = 0; row < BOARD_SIZE; row++)
-	{
-		for (int col = 0; col < BOARD_SIZE; col++)
-		{
+  for (int row = 0; row < BOARD_SIZE; row++)
+  {
+    for (int col = 0; col < BOARD_SIZE; col++)
+    {
 
-			string value = "";
+      string value = "";
 
-			// black or white
-			if (row <= 1)
-				value = "W";
-			else if (row >= 6)
-				value = "B";
+      // black or white
+      if (row <= 1)
+        value = "W";
+      else if (row >= 6)
+        value = "B";
 
-			if (row == 1 || row == 6)
-				value = value + "P";
+      if (row == 1 || row == 6)
+        value = value + "P";
 
-			else if (row == 7 || row == 0)
-				if (col == 0 || col == 7)
-				value = value + "R";
-			else if (col == 1 || col == 6)
-				value = value + "N";
-			else if (col == 2 || col == 5)
-				value = value + "B";
-			else if (col == 3)
-				value = value + "Q";
-			else if (col == 4)
-				value = value + "K";
+      else if (row == 7 || row == 0)
+        if (col == 0 || col == 7)
+          value = value + "R";
+        else if (col == 1 || col == 6)
+          value = value + "N";
+        else if (col == 2 || col == 5)
+          value = value + "B";
+        else if (col == 3)
+          value = value + "Q";
+        else if (col == 4)
+          value = value + "K";
 
-			board[row][col] = value;
-		}
-	}
+      board[row][col] = value;
+    }
+  }
 }
 
 // when the user wants to shut down
@@ -395,7 +310,7 @@ task main()
 	eraseDisplay();
 
 
-	// Open File
+	// Open FIle
 	// TFileHandle FileIn;
 	// openReadPC (FileIn, "*FileName*");
 
