@@ -275,12 +275,13 @@ void boardInitState()
   }
 }
 
-// complete this later
+// when the user wants to shut down
 void shutDownProcedure()
 {
-	// hi
+
 }
 
+// main function
 task main()
 {
 	configureSensors();
@@ -321,7 +322,6 @@ task main()
 	// int initialRow[length];
 	// string finalColumn[length];
 	// int finalRow[length];
-
 
 	// close and open file again to read
 	// closeFilePC (FileIn);
