@@ -80,20 +80,29 @@ void getFileInput (TFileHandle &FileIn, string initialColumn[], int initialRow[]
 	}
 }
 */
-
-// getting the user input
-void getInput(int &currentLetter, int &currentNumber)
+void getCellInput(int &currentLetter, int &currentNumber, bool current)
 {
 	// ascii
 	currentLetter = 65;
 	currentNumber = 1;
-	displayString(1, "in function");
 	while (true)
 	{
+
+		// will have to test if this ascii casting works
+		if (current)
+			displayBigTextLine(2, "Current: %c%d", currentLetter, currentNumber);
+		else
+			displayBigTextLine(4, "Final: %c%d", currentLetter, currentNumber);
+
 		while (!getButtonPress(buttonAny))
 		{ }
 
-		if (getButtonPress(buttonEnter)) return;
+		if (getButtonPress(buttonEnter))
+		{
+			while(getButtonPress(buttonEnter)
+			{ }
+			return;
+		}
 
 		if (getButtonPress(buttonLeft))
 			currentLetter -= 1;
@@ -116,10 +125,23 @@ void getInput(int &currentLetter, int &currentNumber)
 			currentNumber = 8;
 		if (currentNumber > 8)
 			currentNumber = 1;
-
-		// will have to test if this ascii casting works
-		displayString(2, "Current Position: %c%d", currentLetter, currentNumber);
 	}
+}
+
+// getting the user input
+void getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &moveToNumber)
+{
+	// ascii
+	currentLetter = 65;
+	currentNumber = 1;
+	moveToLetter = 65;
+	moveToNumber = 1;
+
+	getCellInput(currentLetter, currentNumber, true);
+	getCellInput(currentLetter, currentNumber, false);
+
+	wait1Msec(500);
+	eraseDisplay();
 }
 
 // zeroing function
@@ -344,9 +366,8 @@ task main()
 		bool whiteTurn = true;
 		while(playing)
 		{
-			int currentLetter;
-			int currentNumber;
-			getInput(currentLetter, currentNumber);
+			int currentLetter, currentNumber, moveToLetter, moveToNumber;
+			getInput(currentLetter, currentNumber, moveToLetter, moveToNumber);
 			playing = false;
 		}
 		// keep track of turn (probably boolean is fine)
