@@ -2,6 +2,7 @@
 #include "EV3Servo-lib-UW.c"
 
 const int BOARD_SIZE = 8;
+const int BOARD_DIMENSION = 5.5; //cm
 
 // 2d array with the board location
 // bk, wk, k, q, b, r, p, n for knight
@@ -14,6 +15,7 @@ string board[BOARD_SIZE][BOARD_SIZE];
 const int TOUCH = S1;
 const int COLOR = S2;
 const int XZEROTOUCH = S3;
+const int RED = colorRed;
 
 const int XMOTOR = motorA;
 const int YMOTOR = motorB;
@@ -151,17 +153,15 @@ void moveToCell(int currX, int currY, int x, int y)
 	for (int count = 0; count < travelX; count++)
 	{
 		motor[XMOTOR] = XMOTORPOWER * directionX;
-		// need to figure this out
-		// while(SensorValue(COLOR) != color.RED)
-		// {}
+		while(SensorValue(COLOR) != RED)
+		{ }
 	}
 
 	for (int count = 0; count < travelY; count++)
 	{
 		motor[YMOTOR] = YMOTORPOWER * directionY;
-		// need to figure this out
-		// while(COLOR != red)
-		// {}
+		while(SensorValue(COLOR) != RED)
+		{ }
 	}
 }
 
@@ -338,5 +338,5 @@ task main()
 	// back to top of while loop
 
 	// Close File closeFilePC (FileIn);
-	// exit when the user says so..? don't think we can check for checkmates soooo.....
+	// exit when the user says so
 }
