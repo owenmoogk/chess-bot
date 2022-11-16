@@ -26,6 +26,7 @@ const int CLAWWAITTIME = 100;
 const int CLAWLOWERCLICKS = 360;
 const int SV_GRIPPER = 4;
 
+// where the taken peices go
 const int ENDX = 9;
 const int ENDY = 9;
 
@@ -132,26 +133,8 @@ void zero()
 }
 
 // move to cell
-
-/*
-Eidan:
-I think we should have a few functions that relate to moving to a cell.
-One function will be a void function and all it will do it move across the X-axis EXACTLY one cell.
-On finction will be a void funciton that will move the Y-AXis pully EXACTLY one cell.
-These functions would take in a bool (0/1). 0 means forwards/positive, 1 means reverse/negative.
-
-Then the moveing funciton will take in the current (x,y) and the desired (x,y) position,
-and call the x/y movement funcitons a certain number of times with the specific direction (0/1).
-
-*/
 void moveToCell(int currX, int currY, int x, int y)
 {
-	// too much thinking rn
-	// calculate distance to cell
-	// move x axis
-	// move z axis
-
-	// some of this is pseudocode because im tired, this probably wont work
 	int colorCount = 0;
 	int travelX = currX - x;
 	int travelY = currY - y;
@@ -170,18 +153,18 @@ void moveToCell(int currX, int currY, int x, int y)
 
 	for (int count = 0; count < travelX; count++)
 	{
-		motor[XMOTOR] = motorPowerX - (2*motorPower*(directionX*-1)); //bool direction - true is moving backwards, false is forwards
-
-		while(COLOR != red)
-		{}
+		motor[XMOTOR] = XMOTORPOWER * directionX;
+		// need to figure this out
+		// while(SensorValue(COLOR) != color.RED)
+		// {}
 	}
 
 	for (int count = 0; count < travelY; count++)
 	{
-		motor[YMOTOR] = motorPowerY - (2*motorPower*(directionY*-1));
-
-		while(COLOR != red)
-		{}
+		motor[YMOTOR] = YMOTORPOWER * directionY;
+		// need to figure this out
+		// while(COLOR != red)
+		// {}
 	}
 }
 
@@ -277,6 +260,7 @@ void boardInitState()
 
       if (row == 1 || row == 6)
         value = value + "P";
+
       else if (row == 7 || row == 0)
         if (col == 0 || col == 7)
           value = value + "R";
