@@ -1,4 +1,4 @@
-// #include "PC_FileIO.c"
+#include "PC_FileIO.c"
 #include "EV3Servo-lib-UW.c"
 
 const int BOARD_SIZE = 8;
@@ -309,13 +309,16 @@ task main()
 
 	eraseDisplay();
 
-
-	// Open FIle
+	if (reviewGame)
+	{
+		// Open FIle
 	// TFileHandle FileIn;
 	// openReadPC (FileIn, "*FileName*");
 
 	// Get File Length
 	// int length = getFileLength (FileIn);
+		// closeFilePC (FileIn);
+	// openReadPC (FileIn, "*FileName*");
 
 	// Make arrays
 	// string initialColumn[length];
@@ -323,20 +326,21 @@ task main()
 	// string finalColumn[length];
 	// int finalRow[length];
 
-	// close and open file again to read
-	// closeFilePC (FileIn);
-	// openReadPC (FileIn, "*FileName*");
-
-	// while loop
-	// keep track of turn (probably boolean is fine)
-	// prompt for move
-	// move to position
-	// pick up
-	// move to position
-	// place
-	// move to zero?
-	// back to top of while loop
+	// get file input
 
 	// Close File closeFilePC (FileIn);
-	// exit when the user says so
+	}
+	else
+	{
+		// while loop
+		// keep track of turn (probably boolean is fine)
+		// prompt for move
+		// move to position
+		// pick up
+		// move to position
+		// place
+		// move to zero?
+		// back to top of while loop
+
+	}
 }
