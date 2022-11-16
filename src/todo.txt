@@ -1,0 +1,4 @@
+Make big text lines
+Color detection
+Shutdown procedure
+Main function
