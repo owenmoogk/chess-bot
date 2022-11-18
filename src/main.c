@@ -12,22 +12,23 @@ string board[BOARD_SIZE][BOARD_SIZE];
 // on startup, the y-axis (pulley) MUST be at the same point (probably zero)
 // otherwise we have to change the init function, I don't think we'll have a touch sensor there to 'zero'
 
-const int TOUCH = S1;
-const int COLOR = S2;
-const int XZEROTOUCH = S3;
+const int TOUCH = S4;
+const int COLOR = S3;
+const int XZEROTOUCH = S2;
 const int RED = colorRed;
 
-const int XMOTOR = motorA;
-const int YMOTOR = motorB;
-const int XMOTORPOWER = 50;
-const int YMOTORPOWER = 50;
+const int XMOTOR = motorD;
+const int YMOTOR = motorC;
+const int XMOTORPOWER = 20;
+const int YMOTORPOWER = 20;
+const int YCELLCLICKS = 100;
 
-const int CLAWACTUATIONMOTOR = motorC;
+const int CLAWACTUATIONMOTOR = motorB;
 const int CLAWMOTOR = S1;
 const int CLAWCLOSE = 10;
 const int CLAWOPEN = 70;
 const int CLAWWAITTIME = 100;
-const int CLAWLOWERCLICKS = 360;
+const int CLAWLOWERCLICKS = 200;
 const int SV_GRIPPER = 4;
 
 // where the taken peices go
@@ -129,8 +130,8 @@ void zero()
 // move to cell
 void moveToCell(int currX, int currY, int x, int y)
 {
-	int travelX = x - currX;
-	int travelY = y - currY;
+	int travelX = currX - x;
+	int travelY = currY - y;
 	int directionX = -1;
 	int directionY = 1;
 
@@ -140,19 +141,21 @@ void moveToCell(int currX, int currY, int x, int y)
 	if (travelY < 0)
 		directionY *= -1;
 
-	for (int count = 0; count < travelX; count++)
+	for (int count = 0; count < abs(travelX); count++)
 	{
 		motor[XMOTOR] = XMOTORPOWER * directionX;
 		while(SensorValue(COLOR) != RED)
 		{ }
-	}
-
-	for (int count = 0; count < travelY; count++)
-	{
-		motor[YMOTOR] = YMOTORPOWER * directionY;
-		while(SensorValue(COLOR) != RED)
+		while(SensorValue(COLOR) == RED)
 		{ }
 	}
+	wait1Msec(200);
+	motor[XMOTOR] = 0;
+
+	motor[YMOTOR] = YMOTORPOWER * directionY;
+	while(abs(nMotorEncoder(YMOTOR)) < abs(YCELLCLICKS))
+	{ }
+	motor[YMOTOR] = 0;
 }
 
 //Function for when there is a piece that needs to be taken, etc..
@@ -166,15 +169,16 @@ void moveToCell(int currX, int currY, int x, int y)
 // picking up the peice when the claw is in place
 void pickUpPiece()
 {
+	setGripperPosition(CLAWMOTOR,SV_GRIPPER,CLAWOPEN);
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWACTUATIONMOTOR] = 10;
+	motor[CLAWACTUATIONMOTOR] = -10;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 	setGripperPosition(CLAWMOTOR,SV_GRIPPER,CLAWCLOSE);
 	wait1Msec(CLAWWAITTIME);
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWACTUATIONMOTOR] = -10;
+	motor[CLAWACTUATIONMOTOR] = 10;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
@@ -184,14 +188,14 @@ void pickUpPiece()
 void putDownPiece()
 {
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWACTUATIONMOTOR] = 10;
+	motor[CLAWACTUATIONMOTOR] = -10;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 	setGripperPosition(CLAWMOTOR, SV_GRIPPER, CLAWOPEN);
 	wait1Msec(CLAWWAITTIME);
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWACTUATIONMOTOR] = -10;
+	motor[CLAWACTUATIONMOTOR] = 10;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
@@ -277,78 +281,31 @@ task main()
 	configureSensors();
 	boardInitState();
 
-	// UI
+	int x1,y1,x2,y2;
+	getInput(x1,y1,x2,y2);
+	zero();
+	pickUpPiece();
+	moveToCell(x1,y1,x2,y2);
+	putDownPiece();
 
-	bool playing = false; // CHANGE THIS LINE
-	bool reviewGame = false;
+	/*
 
+	playing = true;
+	bool whiteTurn = true;
 	while(playing)
 	{
-		displayBigTextLine(1,"Game Mode");
-		displayString(3,"Toggle with UP/DOWN");
-		if(reviewGame)
-			displayBigTextLine(5, "Review Game");
-		else
-			displayBigTextLine(5, "Play Game");
-
-		if(getButtonPress(buttonUp) || getButtonPress(buttonDown))
-		{
-			reviewGame = !reviewGame;
-			while(getButtonPress(buttonUp) || getButtonPress(buttonDown))
-			{ }
-		}
-
-		if(getButtonPress(buttonEnter))
-			playing = false;
-			while(getButtonPress(buttonEnter))
-			{}
+		int currentLetter, currentNumber, moveToLetter, moveToNumber;
+		getInput(currentLetter, currentNumber, moveToLetter, moveToNumber);
+		playing = false;
 	}
 
-	eraseDisplay();
-
-	if (reviewGame)
-	{
-		// Open FIle
-		// TFileHandle FileIn;
-		// openReadPC (FileIn, "*FileName*");
-
-		// Get File Length
-		// int length = getFileLength (FileIn);
-		// closeFilePC (FileIn);
-		// openReadPC (FileIn, "*FileName*");
-
-		// Make arrays
-		// string initialColumn[length];
-		// int initialRow[length];
-		// string finalColumn[length];
-		// int finalRow[length];
-
-		// get file input
-
-		// Close File closeFilePC (FileIn);
-	}
-	else
-	{
-		playing = true;
-		bool whiteTurn = true;
-		while(playing)
-		{
-			int currentLetter, currentNumber, moveToLetter, moveToNumber;
-			getInput(currentLetter, currentNumber, moveToLetter, moveToNumber);
-			playing = false;
-		}
-		// keep track of turn (probably boolean is fine)
-		// move to position
-		// pick up
-		// move to position
-		// place
-		// move to zero?
-		// back to top of while loop
-
-	}
-}
-
-
-
+	*/
+	// keep track of turn (probably boolean is fine)
+	// move to position
+	// pick up
+	// move to position
+	// place
+	// move to zero?
+	// back to top of while loop
 
 }
