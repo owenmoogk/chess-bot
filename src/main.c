@@ -66,7 +66,7 @@ void getCellInput(int &currentLetter, int &currentNumber, bool current)
 
 		if (getButtonPress(buttonEnter))
 		{
-			while(getButtonPress(buttonEnter)
+			while(getButtonPress(buttonEnter))
 			{ }
 			return;
 		}
@@ -164,7 +164,7 @@ void moveToCell(int currX, int currY, int x, int y)
 // replay the game
 
 // picking up the peice when the claw is in place
-void pickUpPeice()
+void pickUpPiece()
 {
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = 10;
@@ -181,7 +181,7 @@ void pickUpPeice()
 }
 
 // putting down the peice when the claw is in place
-void putDownPeice()
+void putDownPiece()
 {
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = 10;
@@ -199,29 +199,29 @@ void putDownPeice()
 
 
 // execute move fucntion
-bool movePeice(int x1, int y1, int x2, int y2)
+bool movePiece(int x1, int y1, int x2, int y2)
 {
 	// if endpos same as start pos, or color already obtains the destination cell, move is invalid
 	if ((x1 == x2 && y1 == y2) || (stringFind(board[x2][y2], "W") == stringFind(board[x1][y1], "W")))
 	{
 		return false;
 	}
-	// if the board has another peice here
+	// if the board has another piece here
 	if (board[x2][y2] != "")
 	{
 		moveToCell(0,0,x2,y2);
-		pickUpPeice();
+		pickUpPiece();
 		moveToCell(x2,y2,ENDX,ENDY);
-		putDownPeice();
+		putDownPiece();
 		moveToCell(ENDX, ENDY, x1, y1);
 	}
 	else
 	{
 		moveToCell(0,0,x1,y1);
 	}
-	pickUpPeice();
+	pickUpPiece();
 	moveToCell(x1,y1,x2,y2);
-	putDownPeice();
+	putDownPiece();
 	// have to check for legal move here
 	board[x2][y2] = board[x1][y1];
 	board[x1][y1] = "";
@@ -279,7 +279,7 @@ task main()
 
 	// UI
 
-	bool playing = true;
+	bool playing = false; // CHANGE THIS LINE
 	bool reviewGame = false;
 
 	while(playing)
@@ -300,7 +300,7 @@ task main()
 
 		if(getButtonPress(buttonEnter))
 			playing = false;
-			while(getButtonPress(buttonEnter)
+			while(getButtonPress(buttonEnter))
 			{}
 	}
 
