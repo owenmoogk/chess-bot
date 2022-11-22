@@ -18,10 +18,10 @@ const int XZEROTOUCH = S2;
 const int RED = colorRed;
 
 const int XMOTOR = motorD;
-const int YMOTOR = motorC;
+const int YMOTOR = motorA;
 const int XMOTORPOWER = 20;
-const int YMOTORPOWER = 20;
-const int YCELLCLICKS = 100;
+const int YMOTORPOWER = 60;
+const int YCELLCLICKS = 820;
 
 const int CLAWACTUATIONMOTOR = motorB;
 const int CLAWMOTOR = S1;
@@ -106,7 +106,15 @@ void getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &mo
 	moveToNumber = 1;
 
 	getCellInput(currentLetter, currentNumber, true);
-	getCellInput(currentLetter, currentNumber, false);
+	getCellInput(moveToLetter, moveToNumber, false);
+
+	currentLetter -= 65;
+	moveToLetter -= 65;
+	currentNumber -= 1;
+	moveToNumber -= 1;
+
+	currentLetter = 7-currentLetter;
+	moveToLetter = 7-currentLetter;
 
 	wait1Msec(500);
 	eraseDisplay();
@@ -115,14 +123,14 @@ void getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &mo
 // zeroing function
 void zero()
 {
-	motor[XMOTOR] = -10;
+	motor[XMOTOR] = -30;
 	while (!SensorValue[XZEROTOUCH])
 	{	}
 	motor[XMOTOR] = 0;
 
-	// assuming (-) is 'backwards' towards the 'zero point'
-	motor[YMOTOR] = -10;
-	while (nMotorEncoder[YMOTOR] > 0)
+	// assuming (+) is 'backwards' towards the 'zero point'
+	motor[YMOTOR] = 60;
+	while (nMotorEncoder[YMOTOR] < 0)
 	{ }
 	motor[YMOTOR] = 0;
 }
@@ -153,7 +161,7 @@ void moveToCell(int currX, int currY, int x, int y)
 	motor[XMOTOR] = 0;
 
 	motor[YMOTOR] = YMOTORPOWER * directionY;
-	while(abs(nMotorEncoder(YMOTOR)) < abs(YCELLCLICKS))
+	while(abs(nMotorEncoder(YMOTOR)) < abs(YCELLCLICKS * y))
 	{ }
 	motor[YMOTOR] = 0;
 }
@@ -284,9 +292,16 @@ task main()
 	int x1,y1,x2,y2;
 	getInput(x1,y1,x2,y2);
 	zero();
+	moveToCell(0,0,x1,y1);
 	pickUpPiece();
 	moveToCell(x1,y1,x2,y2);
 	putDownPiece();
+	zero();
+
+	//displayBigTextLine(1,	"Second: %d %d", x2, y2);
+	//zero();
+	//moveToCell(0,0,x2,y2);
+	//putDownPiece();
 
 	/*
 
