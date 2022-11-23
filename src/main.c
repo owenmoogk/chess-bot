@@ -18,8 +18,8 @@ const int RED = colorRed;
 const int XMOTOR = motorD;
 const int YMOTOR = motorA;
 const int XMOTORPOWER = 20;
-const int YMOTORPOWER = 60;
-const int YCELLCLICKS = 1100;
+const int YMOTORPOWER = 100;
+const int YCELLCLICKS = 1185;
 
 const int CLAWACTUATIONMOTOR = motorB;
 const int CLAWMOTOR = S1;
@@ -127,7 +127,7 @@ void zero()
 	motor[XMOTOR] = 0;
 
 	// assuming (+) is 'backwards' towards the 'zero point'
-	motor[YMOTOR] = 60;
+	motor[YMOTOR] = 100;
 	while (nMotorEncoder[YMOTOR] < 0)
 	{ }
 	motor[YMOTOR] = 0;
@@ -164,17 +164,18 @@ void moveToCell(int currX, int currY, int x, int y)
 			{ }
 		}
 	}
+
 	motor[XMOTOR] = 0;
 
 	motor[YMOTOR] = YMOTORPOWER * directionY;
 	if (directionY == 1)
 	{
-		while(abs(nMotorEncoder(YMOTOR)) > abs(YCELLCLICKS * y))
+		while(abs(nMotorEncoder(YMOTOR)) > abs(YCELLCLICKS * y) && nMotorEncoder(YMOTOR) < 20)
 		{ }
 	}
 	if (directionY == -1)
 	{
-		while(abs(nMotorEncoder(YMOTOR)) < abs(YCELLCLICKS * y))
+		while(abs(nMotorEncoder(YMOTOR)) < abs(YCELLCLICKS * y) && nMotorEncoder(YMOTOR) < 20)
 		{ }
 	}
 
@@ -229,8 +230,8 @@ void capturePiece(int x2, int y2)
 		moveToCell(0,0,x2,y2);
 		pickUpPiece();
 		moveToCell(x2,y2,ENDX,ENDY);
-		motor[XMOTOR] = -10;
-		wait1Msec(500);
+		motor[XMOTOR] = 30;
+		wait1Msec(1000);
 		motor[XMOTOR] = 0;
 		putDownPiece();
 		return;
@@ -240,7 +241,7 @@ void capturePiece(int x2, int y2)
 bool movePiece(int x1, int y1, int x2, int y2)
 {
 	// if endpos same as start pos, or color already obtains the destination cell, move is invalid
-	/*if ((x1 == x2 && y1 == y2) || (stringFind(board[y2][x2], "W") == stringFind(board[y1][x1], "W")))
+	if ((x1 == x2 && y1 == y2) || (stringFind(board[y2][x2], "W") == stringFind(board[y1][x1], "W")))
 	{
 		displayBigTextLine(1, "Invalid Move");
 		displayBigTextLine(3, "Try again");
@@ -251,11 +252,11 @@ bool movePiece(int x1, int y1, int x2, int y2)
 
 	if (board[y2][x2] != "")
 	{
-		displayBigTextLine(2,"SHABD BIG PP");
+		displayBigTextLine(2,"GET CAPTURED!!");
 		wait1Msec(2000);
 		capturePiece(x2,y2);
 		zero();
-	}*/
+	}
 	moveToCell(0,0,x1,y1);
 	pickUpPiece();
 	moveToCell(x1,y1,x2,y2);
