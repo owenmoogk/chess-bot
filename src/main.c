@@ -1,8 +1,6 @@
-#include "PC_FileIO.c"
 #include "EV3Servo-lib-UW.c"
 
 const int BOARD_SIZE = 8;
-const int BOARD_DIMENSION = 5.5; //cm
 
 // 2d array with the board location
 // bk, wk, k, q, b, r, p, n for knight
@@ -21,19 +19,19 @@ const int XMOTOR = motorD;
 const int YMOTOR = motorA;
 const int XMOTORPOWER = 20;
 const int YMOTORPOWER = 60;
-const int YCELLCLICKS = 820;
+const int YCELLCLICKS = 1100;
 
 const int CLAWACTUATIONMOTOR = motorB;
 const int CLAWMOTOR = S1;
 const int CLAWCLOSE = 10;
 const int CLAWOPEN = 70;
-const int CLAWWAITTIME = 100;
-const int CLAWLOWERCLICKS = 200;
+const int CLAWWAITTIME = 500;
+const int CLAWLOWERCLICKS = 230;
 const int SV_GRIPPER = 4;
 
 // where the taken peices go
-const int ENDX = 9;
-const int ENDY = 9;
+const int ENDX = 7;
+const int ENDY = 0;
 
 // sensor configuration
 void configureSensors()
@@ -114,7 +112,7 @@ void getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &mo
 	moveToNumber -= 1;
 
 	currentLetter = 7-currentLetter;
-	moveToLetter = 7-currentLetter;
+	moveToLetter = 7-moveToLetter;
 
 	wait1Msec(500);
 	eraseDisplay();
@@ -133,6 +131,8 @@ void zero()
 	while (nMotorEncoder[YMOTOR] < 0)
 	{ }
 	motor[YMOTOR] = 0;
+
+	setGripperPosition(CLAWMOTOR,SV_GRIPPER,CLAWOPEN);
 }
 
 // move to cell
@@ -143,26 +143,41 @@ void moveToCell(int currX, int currY, int x, int y)
 	int directionX = -1;
 	int directionY = 1;
 
+
 	if (travelX < 0)
+	{
 		directionX *= -1;
+	}
 
 	if (travelY < 0)
 		directionY *= -1;
 
-	for (int count = 0; count < abs(travelX); count++)
+	for (int count = 0; count < abs(travelX) + 1; count++)
 	{
 		motor[XMOTOR] = XMOTORPOWER * directionX;
+		wait1Msec(50);
 		while(SensorValue(COLOR) != RED)
 		{ }
-		while(SensorValue(COLOR) == RED)
-		{ }
+		if (count != abs(travelX) || directionX == -1)
+		{
+			while(SensorValue(COLOR) == RED)
+			{ }
+		}
 	}
-	wait1Msec(200);
 	motor[XMOTOR] = 0;
 
 	motor[YMOTOR] = YMOTORPOWER * directionY;
-	while(abs(nMotorEncoder(YMOTOR)) < abs(YCELLCLICKS * y))
-	{ }
+	if (directionY == 1)
+	{
+		while(abs(nMotorEncoder(YMOTOR)) > abs(YCELLCLICKS * y))
+		{ }
+	}
+	if (directionY == -1)
+	{
+		while(abs(nMotorEncoder(YMOTOR)) < abs(YCELLCLICKS * y))
+		{ }
+	}
+
 	motor[YMOTOR] = 0;
 }
 
@@ -209,34 +224,45 @@ void putDownPiece()
 	motor[CLAWACTUATIONMOTOR] = 0;
 }
 
+void capturePiece(int x2, int y2)
+{
+		moveToCell(0,0,x2,y2);
+		pickUpPiece();
+		moveToCell(x2,y2,ENDX,ENDY);
+		motor[XMOTOR] = -10;
+		wait1Msec(500);
+		motor[XMOTOR] = 0;
+		putDownPiece();
+		return;
+}
 
 // execute move fucntion
 bool movePiece(int x1, int y1, int x2, int y2)
 {
 	// if endpos same as start pos, or color already obtains the destination cell, move is invalid
-	if ((x1 == x2 && y1 == y2) || (stringFind(board[x2][y2], "W") == stringFind(board[x1][y1], "W")))
+	/*if ((x1 == x2 && y1 == y2) || (stringFind(board[y2][x2], "W") == stringFind(board[y1][x1], "W")))
 	{
+		displayBigTextLine(1, "Invalid Move");
+		displayBigTextLine(3, "Try again");
+		wait1Msec(3000);
 		return false;
 	}
 	// if the board has another piece here
-	if (board[x2][y2] != "")
+
+	if (board[y2][x2] != "")
 	{
-		moveToCell(0,0,x2,y2);
-		pickUpPiece();
-		moveToCell(x2,y2,ENDX,ENDY);
-		putDownPiece();
-		moveToCell(ENDX, ENDY, x1, y1);
-	}
-	else
-	{
-		moveToCell(0,0,x1,y1);
-	}
+		displayBigTextLine(2,"SHABD BIG PP");
+		wait1Msec(2000);
+		capturePiece(x2,y2);
+		zero();
+	}*/
+	moveToCell(0,0,x1,y1);
 	pickUpPiece();
 	moveToCell(x1,y1,x2,y2);
 	putDownPiece();
 	// have to check for legal move here
-	board[x2][y2] = board[x1][y1];
-	board[x1][y1] = "";
+	//board[x2][y2] = board[x1][y1];
+	//board[x1][y1] = "";
 	zero();
 
 	return true;
@@ -291,11 +317,11 @@ task main()
 
 	int x1,y1,x2,y2;
 	getInput(x1,y1,x2,y2);
+	//zero();
+	//movePiece(x1,y1,x2,y2);
 	zero();
-	moveToCell(0,0,x1,y1);
-	pickUpPiece();
-	moveToCell(x1,y1,x2,y2);
-	putDownPiece();
+
+	movePiece(x1,y1,x2,y2);
 	zero();
 
 	//displayBigTextLine(1,	"Second: %d %d", x2, y2);
