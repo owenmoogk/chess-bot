@@ -19,14 +19,14 @@ const int XMOTOR = motorD;
 const int YMOTOR = motorA;
 const int XMOTORPOWER = 20;
 const int YMOTORPOWER = 100;
-const int YCELLCLICKS = 1185;
+const int YCELLCLICKS = 1175;
 
 const int CLAWACTUATIONMOTOR = motorB;
 const int CLAWMOTOR = S1;
 const int CLAWCLOSE = 10;
 const int CLAWOPEN = 70;
 const int CLAWWAITTIME = 500;
-const int CLAWLOWERCLICKS = 230;
+const int CLAWLOWERCLICKS = 260;
 const int SV_GRIPPER = 4;
 
 // where the taken peices go
@@ -95,8 +95,32 @@ void getCellInput(int &currentLetter, int &currentNumber, bool current)
 }
 
 // getting the user input
-void getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &moveToNumber)
+bool getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &moveToNumber)
 {
+	displayBigTextLine(1,"Continue?");
+	bool exit = false;
+	bool doContinue = true;
+	while(!exit)
+	{
+		if (getButtonPress(buttonEnter))
+			exit = true;
+		else if (getButtonPress(buttonRight) || getButtonPress(buttonLeft))
+		{
+			doContinue = !doContinue;
+			while(getButtonPress(buttonRight) || getButtonPress(buttonLeft))
+			{ }
+		}
+		if (doContinue)
+			displayBigTextLine(3,"Yes");
+		else
+			displayBigTextLine(3,"No");
+	}
+	while(getButtonPress(buttonEnter))
+	{ }
+	eraseDisplay();
+	if (!doContinue)
+		return false;
+
 	// ascii
 	currentLetter = 65;
 	currentNumber = 1;
@@ -116,6 +140,7 @@ void getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &mo
 
 	wait1Msec(500);
 	eraseDisplay();
+	return true;
 }
 
 // zeroing function
@@ -143,7 +168,6 @@ void moveToCell(int currX, int currY, int x, int y)
 	int directionX = -1;
 	int directionY = 1;
 
-
 	if (travelX < 0)
 	{
 		directionX *= -1;
@@ -167,15 +191,18 @@ void moveToCell(int currX, int currY, int x, int y)
 
 	motor[XMOTOR] = 0;
 
+	motor[YMOTOR] = -100;
+	wait1Msec(150);
+
 	motor[YMOTOR] = YMOTORPOWER * directionY;
 	if (directionY == 1)
 	{
-		while(abs(nMotorEncoder(YMOTOR)) > abs(YCELLCLICKS * y) && nMotorEncoder(YMOTOR) < 20)
+		while(abs(nMotorEncoder(YMOTOR)) > abs(YCELLCLICKS * y) && nMotorEncoder(YMOTOR) < 0)
 		{ }
 	}
 	if (directionY == -1)
 	{
-		while(abs(nMotorEncoder(YMOTOR)) < abs(YCELLCLICKS * y) && nMotorEncoder(YMOTOR) < 20)
+		while(abs(nMotorEncoder(YMOTOR)) < abs(YCELLCLICKS * y) && nMotorEncoder(YMOTOR) < 0)
 		{ }
 	}
 
@@ -216,6 +243,7 @@ void putDownPiece()
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
+	wait1Msec(CLAWWAITTIME);
 	setGripperPosition(CLAWMOTOR, SV_GRIPPER, CLAWOPEN);
 	wait1Msec(CLAWWAITTIME);
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
@@ -231,7 +259,7 @@ void capturePiece(int x2, int y2)
 		pickUpPiece();
 		moveToCell(x2,y2,ENDX,ENDY);
 		motor[XMOTOR] = 30;
-		wait1Msec(1000);
+		wait1Msec(900);
 		motor[XMOTOR] = 0;
 		putDownPiece();
 		return;
@@ -241,7 +269,10 @@ void capturePiece(int x2, int y2)
 bool movePiece(int x1, int y1, int x2, int y2)
 {
 	// if endpos same as start pos, or color already obtains the destination cell, move is invalid
-	if ((x1 == x2 && y1 == y2) || (stringFind(board[y2][x2], "W") == stringFind(board[y1][x1], "W")))
+//|| (stringFind(board[y2][x2], "W") == stringFind(board[y1][x1], "W"))
+// if your black and the other is nothing then oop, not a valid move
+// whoohoo figured it out
+	if ((x1 == x2 && y1 == y2) )
 	{
 		displayBigTextLine(1, "Invalid Move");
 		displayBigTextLine(3, "Try again");
@@ -252,18 +283,20 @@ bool movePiece(int x1, int y1, int x2, int y2)
 
 	if (board[y2][x2] != "")
 	{
-		displayBigTextLine(2,"GET CAPTURED!!");
-		wait1Msec(2000);
 		capturePiece(x2,y2);
 		zero();
 	}
+	//displayBigTextLine(1, "X1: %d", x1);
+	//displayBigTextLine(3, "Y1: %d", y1);
+	//displayBigTextLine(5, "X2: %d", x2);
+	//displayBigTextLine(7, "Y2: %d", y2);
 	moveToCell(0,0,x1,y1);
 	pickUpPiece();
 	moveToCell(x1,y1,x2,y2);
 	putDownPiece();
-	// have to check for legal move here
-	//board[x2][y2] = board[x1][y1];
-	//board[x1][y1] = "";
+
+	board[y2][x2] = board[y1][x1];
+	board[y1][x1] = "";
 	zero();
 
 	return true;
@@ -305,9 +338,15 @@ void boardInitState()
 }
 
 // when the user wants to shut down
-void shutDownProcedure()
+void shutDownProcedure(bool whiteLoses)
 {
-
+	if (whiteLoses)
+		displayBigTextLine(2,"Black Wins!");
+	else
+		displayBigTextLine(2,"White Wins!");
+	displayBigTextLine(4,"By forfeit");
+	zero();
+	wait1Msec(5000);
 }
 
 // main function
@@ -316,38 +355,36 @@ task main()
 	configureSensors();
 	boardInitState();
 
-	int x1,y1,x2,y2;
-	getInput(x1,y1,x2,y2);
-	//zero();
-	//movePiece(x1,y1,x2,y2);
-	zero();
+	int whiteTime = 300;
+	int blackTime = 300;
 
-	movePiece(x1,y1,x2,y2);
-	zero();
-
-	//displayBigTextLine(1,	"Second: %d %d", x2, y2);
-	//zero();
-	//moveToCell(0,0,x2,y2);
-	//putDownPiece();
-
-	/*
-
-	playing = true;
 	bool whiteTurn = true;
+	bool playing = true;
 	while(playing)
 	{
-		int currentLetter, currentNumber, moveToLetter, moveToNumber;
-		getInput(currentLetter, currentNumber, moveToLetter, moveToNumber);
-		playing = false;
-	}
+		clearTimer(T1);
+		int x1,y1,x2,y2;
+		if (whiteTurn)
+			displayBigTextLine(7,"Time Left:%d:%d", whiteTime / 60, whiteTime % 60);
+		else
+			displayBigTextLine(7,"Time Left:%d:%d", blackTime / 60, blackTime % 60);
 
-	*/
-	// keep track of turn (probably boolean is fine)
-	// move to position
-	// pick up
-	// move to position
-	// place
-	// move to zero?
-	// back to top of while loop
+		playing = getInput(x1,y1,x2,y2);
+		if (whiteTurn)
+			whiteTime -= time1[T1] /1000;
+		else
+			blackTime -= time1[T1] /1000;
+
+		if (!playing)
+			shutDownProcedure(whiteTurn);
+
+		if (playing)
+		{
+			zero();
+			movePiece(x1,y1,x2,y2);
+			zero();
+			whiteTurn = !whiteTurn;
+		}
+	}
 
 }
