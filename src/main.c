@@ -19,7 +19,7 @@ const int XMOTOR = motorD;
 const int YMOTOR = motorA;
 const int XMOTORPOWER = 20;
 const int YMOTORPOWER = 100;
-const int YCELLCLICKS = 1175;
+const int YCELLCLICKS = 1180;
 
 const int CLAWACTUATIONMOTOR = motorB;
 const int CLAWMOTOR = S1;
@@ -176,20 +176,22 @@ void moveToCell(int currX, int currY, int x, int y)
 	if (travelY < 0)
 		directionY *= -1;
 
-	for (int count = 0; count < abs(travelX) + 1; count++)
+	if (travelX != 0)
 	{
-		motor[XMOTOR] = XMOTORPOWER * directionX;
-		wait1Msec(50);
-		while(SensorValue(COLOR) != RED)
-		{ }
-		if (count != abs(travelX) || directionX == -1)
+		for (int count = 0; count < abs(travelX) + 1; count++)
 		{
-			while(SensorValue(COLOR) == RED)
+			motor[XMOTOR] = XMOTORPOWER * directionX;
+			wait1Msec(50);
+			while(SensorValue(COLOR) != RED)
 			{ }
+			if (count != abs(travelX) || directionX == -1)
+			{
+				while(SensorValue(COLOR) == RED)
+				{ }
+			}
 		}
+		motor[XMOTOR] = 0;
 	}
-
-	motor[XMOTOR] = 0;
 
 	motor[YMOTOR] = -100;
 	wait1Msec(150);
@@ -338,13 +340,17 @@ void boardInitState()
 }
 
 // when the user wants to shut down
-void shutDownProcedure(bool whiteLoses)
+void shutDownProcedure(bool whiteLoses, int endCode)
 {
 	if (whiteLoses)
 		displayBigTextLine(2,"Black Wins!");
 	else
 		displayBigTextLine(2,"White Wins!");
-	displayBigTextLine(4,"By forfeit");
+
+	if (endCode == 0)
+		displayBigTextLine(4,"By Resignation");
+	if (endCode == 1)
+		displayBigTextLine(4, "On Time";
 	zero();
 	wait1Msec(5000);
 }
@@ -375,8 +381,14 @@ task main()
 		else
 			blackTime -= time1[T1] /1000;
 
+		if (whiteTime == 0 || blackTime == 0)
+		{
+			playing = false;
+			shutDownProcedure(whiteTurn, 1);
+		}
+
 		if (!playing)
-			shutDownProcedure(whiteTurn);
+			shutDownProcedure(whiteTurn, 0);
 
 		if (playing)
 		{
