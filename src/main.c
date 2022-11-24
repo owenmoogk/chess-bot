@@ -190,6 +190,7 @@ void moveToCell(int currX, int currY, int x, int y)
 				{ }
 			}
 		}
+		wait1Msec(100);
 		motor[XMOTOR] = 0;
 	}
 
