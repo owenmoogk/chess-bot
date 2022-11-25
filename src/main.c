@@ -162,7 +162,7 @@ void zero()
 }
 
 // move to cell
-void moveToCell(int currX, int currY, int x, int y)
+void moveToCell(int currX, int currY, int x, int y, bool firstMove)
 {
 	int travelX = currX - x;
 	int travelY = currY - y;
@@ -192,10 +192,14 @@ void moveToCell(int currX, int currY, int x, int y)
 			}
 		}
 		// this is tuned for color sensor positioning
-		if (directionX == 1)
-			wait1Msec(400);
-		else
-			wait1Msec(300);
+
+		wait1Msec(250);
+		motor[XMOTOR] = 0;
+	}
+	else if (firstMove)
+	{
+		motor[XMOTOR] = 30;
+		wait1Msec(150);
 		motor[XMOTOR] = 0;
 	}
 
@@ -254,7 +258,7 @@ void putDownPiece(int x2, int y2)
 		lowerDistance = CLAWLOWERCLICKSTALL;
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = -10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-10)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-30)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 	wait1Msec(CLAWWAITTIME);
@@ -262,16 +266,16 @@ void putDownPiece(int x2, int y2)
 	wait1Msec(CLAWWAITTIME);
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = 10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-10)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-30)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 }
 
 void capturePiece(int x2, int y2)
 {
-		moveToCell(0,0,x2,y2);
+		moveToCell(0,0,x2,y2, true);
 		pickUpPiece(x2,y2);
-		moveToCell(x2,y2,ENDX,ENDY);
+		moveToCell(x2,y2,ENDX,ENDY, false);
 		motor[XMOTOR] = 30;
 		wait1Msec(900);
 		motor[XMOTOR] = 0;
@@ -299,14 +303,15 @@ bool movePiece(int x1, int y1, int x2, int y2)
 	{
 		capturePiece(x2,y2);
 		zero();
+		wait1Msec(300);
 	}
 	//displayBigTextLine(1, "X1: %d", x1);
 	//displayBigTextLine(3, "Y1: %d", y1);
 	//displayBigTextLine(5, "X2: %d", x2);
 	//displayBigTextLine(7, "Y2: %d", y2);
-	moveToCell(0,0,x1,y1);
+	moveToCell(0,0,x1,y1, true);
 	pickUpPiece(x1,y1);
-	moveToCell(x1,y1,x2,y2);
+	moveToCell(x1,y1,x2,y2, false);
 	putDownPiece(x1,y1);
 
 	board[y2][x2] = board[y1][x1];
