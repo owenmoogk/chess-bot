@@ -184,18 +184,19 @@ void moveToCell(int currX, int currY, int x, int y)
 			wait1Msec(50);
 			while(SensorValue(COLOR) != RED)
 			{ }
-			if (count != abs(travelX) || directionX == -1)
+			if (count != abs(travelX))
 			{
 				while(SensorValue(COLOR) == RED)
 				{ }
 			}
 		}
-		wait1Msec(100);
+		// this is tuned for color sensor positioning
+		wait1Msec(150);
 		motor[XMOTOR] = 0;
 	}
 
 	motor[YMOTOR] = -100;
-	wait1Msec(150);
+	wait1Msec(110);
 
 	motor[YMOTOR] = YMOTORPOWER * directionY;
 	if (directionY == 1)
@@ -351,7 +352,7 @@ void shutDownProcedure(bool whiteLoses, int endCode)
 	if (endCode == 0)
 		displayBigTextLine(4,"By Resignation");
 	if (endCode == 1)
-		displayBigTextLine(4, "On Time";
+		displayBigTextLine(4, "On Time");
 	zero();
 	wait1Msec(5000);
 }
