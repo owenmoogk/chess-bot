@@ -19,7 +19,7 @@ const int XMOTOR = motorD;
 const int YMOTOR = motorA;
 const int XMOTORPOWER = 20;
 const int YMOTORPOWER = 100;
-const int YCELLCLICKS = 1180;
+const int YCELLCLICKS = 1175;
 
 const int CLAWACTUATIONMOTOR = motorB;
 const int CLAWMOTOR = S1;
@@ -192,7 +192,10 @@ void moveToCell(int currX, int currY, int x, int y)
 			}
 		}
 		// this is tuned for color sensor positioning
-		wait1Msec(150);
+		if (directionX == 1)
+			wait1Msec(400);
+		else
+			wait1Msec(300);
 		motor[XMOTOR] = 0;
 	}
 
