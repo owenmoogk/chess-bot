@@ -27,6 +27,7 @@ const int CLAWCLOSE = 10;
 const int CLAWOPEN = 70;
 const int CLAWWAITTIME = 500;
 const int CLAWLOWERCLICKS = 280;
+const int CLAWLOWERCLICKSTALL = 185;
 const int SV_GRIPPER = 4;
 
 // where the taken peices go
@@ -222,29 +223,35 @@ void moveToCell(int currX, int currY, int x, int y)
 // replay the game
 
 // picking up the peice when the claw is in place
-void pickUpPiece()
+void pickUpPiece(int x2, int y2)
 {
+	int lowerDistance = CLAWLOWERCLICKS;
+	if (stringFind(board[y2][x2], "K") != -1 || stringFind(board[y2][x2], "Q") != -1)
+		lowerDistance = CLAWLOWERCLICKSTALL;
 	setGripperPosition(CLAWMOTOR,SV_GRIPPER,CLAWOPEN);
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = -10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 	setGripperPosition(CLAWMOTOR,SV_GRIPPER,CLAWCLOSE);
 	wait1Msec(CLAWWAITTIME);
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = 10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 }
 
 // putting down the peice when the claw is in place
-void putDownPiece()
+void putDownPiece(int x2, int y2)
 {
+	int lowerDistance = CLAWLOWERCLICKS;
+	if (stringFind(board[y2][x2], "K") != -1 || stringFind(board[y2][x2], "Q") != -1)
+		lowerDistance = CLAWLOWERCLICKSTALL;
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = -10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-10)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 	wait1Msec(CLAWWAITTIME);
@@ -252,7 +259,7 @@ void putDownPiece()
 	wait1Msec(CLAWWAITTIME);
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
 	motor[CLAWACTUATIONMOTOR] = 10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < CLAWLOWERCLICKS)
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-10)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 }
@@ -260,12 +267,12 @@ void putDownPiece()
 void capturePiece(int x2, int y2)
 {
 		moveToCell(0,0,x2,y2);
-		pickUpPiece();
+		pickUpPiece(x2,y2);
 		moveToCell(x2,y2,ENDX,ENDY);
 		motor[XMOTOR] = 30;
 		wait1Msec(900);
 		motor[XMOTOR] = 0;
-		putDownPiece();
+		putDownPiece(x2,y2);
 		return;
 }
 
@@ -295,9 +302,9 @@ bool movePiece(int x1, int y1, int x2, int y2)
 	//displayBigTextLine(5, "X2: %d", x2);
 	//displayBigTextLine(7, "Y2: %d", y2);
 	moveToCell(0,0,x1,y1);
-	pickUpPiece();
+	pickUpPiece(x1,y1);
 	moveToCell(x1,y1,x2,y2);
-	putDownPiece();
+	putDownPiece(x1,y1);
 
 	board[y2][x2] = board[y1][x1];
 	board[y1][x1] = "";
