@@ -26,7 +26,7 @@ const int CLAWMOTOR = S1;
 const int CLAWCLOSE = 10;
 const int CLAWOPEN = 70;
 const int CLAWWAITTIME = 500;
-const int CLAWLOWERCLICKS = 260;
+const int CLAWLOWERCLICKS = 280;
 const int SV_GRIPPER = 4;
 
 // where the taken peices go
