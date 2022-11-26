@@ -7,22 +7,23 @@
 	Richard Wang
 
 	November 25, 2022
-	Version 58.3
+	Version 58.4
 
 	This code is used to operate the 'carl-bot' chess robot.
-	We poured lots of effort into this project and are very proud of the result.
+	We poured lots of effort into this project and are very proud of the 
+    result.
 
 	Assumptions:
-		- On startup, the program was run previously. This is so the y-axis is at the zero point
-			and the claw lowering is at the zero point as well.
+		- On startup, the program was run previously. 
+          This is so the y-axis is at the zero point
+		  and the claw lowering is at the zero point as well.
 */
 
 // include the claw library
 #include "EV3Servo-lib-UW.c"
 
 // HUGE ASSUMPTION:
-// on startup, the y-axis (pulley) MUST be at the same point (probably zero)
-// otherwise we have to change the init function, I don't think we'll have a touch sensor there to 'zero'
+// on startup, the y-axis (pulley) MUST be at the zero point
 
 // sensor constants
 const int TOUCH = S4;
@@ -88,11 +89,14 @@ void getCellInput(int &currentLetter, int &currentNumber, bool firstLine)
 {
 	while (true)
 	{
-		// the displays cast the current letter to a character via the ascii values
+		// the displays cast the current letter to a character via the 
+        // ascii values
 		if (firstLine)
-			displayBigTextLine(2, "Current: %c%d", currentLetter, currentNumber);
+			displayBigTextLine(2, "Current: %c%d", currentLetter, 
+                               currentNumber);
 		else
-			displayBigTextLine(4, "Final: %c%d", currentLetter, currentNumber);
+			displayBigTextLine(4, "Final: %c%d", currentLetter, 
+                               currentNumber);
 
 		// wait until the button is pressed
 		while (!getButtonPress(buttonAny))
@@ -134,7 +138,8 @@ void getCellInput(int &currentLetter, int &currentNumber, bool firstLine)
 }
 
 // getting the user input (pbr)
-bool getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &moveToNumber)
+bool getInput(int &currentLetter, int &currentNumber, int &moveToLetter, 
+              int &moveToNumber)
 {
 	// first ask the user if they want to continue (or resign)
 	displayBigTextLine(1,"Continue?");
@@ -153,7 +158,7 @@ bool getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &mo
 		else if (getButtonPress(buttonRight) || getButtonPress(buttonLeft))
 		{
 			doContinue = !doContinue;
-			while(getButtonPress(buttonRight) || getButtonPress(buttonLeft))
+			while(getButtonPress(buttonRight)||getButtonPress(buttonLeft))
 			{ }
 		}
 
@@ -191,7 +196,8 @@ bool getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &mo
 	currentNumber -= 1;
 	moveToNumber -= 1;
 
-	// we also need to transpose this so it corresponds correctly with the board
+	// we also need to transpose this so it corresponds correctly with the 
+    // board
 	currentLetter = (BOARD_SIZE-1)-currentLetter;
 	moveToLetter = (BOARD_SIZE-1)-moveToLetter;
 
@@ -256,13 +262,15 @@ void moveToCell(int currX, int currY, int x, int y, bool firstMove)
 			}
 		}
 
-		// this is tuned for color sensor positioning, need to delay to center
+		// this is tuned for color sensor positioning, 
+        // need to delay to center
 		wait1Msec(X_AXIS_OFFSET);
 		// turn off the motor
 		motor[X_MOTOR] = 0;
 	}
 
-	// if we are not moving in the X, and it is picking up the peice, we need to offset the hardware
+	// if we are not moving in the X, and it is picking up the piece, we 
+    // need to offset the hardware
 	else if (firstMove)
 	{
 		motor[X_MOTOR] = X_MOTOR_POWER;
@@ -278,12 +286,14 @@ void moveToCell(int currX, int currY, int x, int y, bool firstMove)
 	motor[Y_MOTOR] = Y_MOTOR_POWER * directionY;
 	if (directionY == 1)
 	{
-		while(abs(nMotorEncoder(Y_MOTOR)) > abs(Y_CELL_CLICKS * y) && nMotorEncoder(Y_MOTOR) < 0)
+		while(abs(nMotorEncoder(Y_MOTOR)) > abs(Y_CELL_CLICKS * y) 
+              && nMotorEncoder(Y_MOTOR) < 0)
 		{ }
 	}
 	if (directionY == -1)
 	{
-		while(abs(nMotorEncoder(Y_MOTOR)) < abs(Y_CELL_CLICKS * y) && nMotorEncoder(Y_MOTOR) < 0)
+		while(abs(nMotorEncoder(Y_MOTOR)) < abs(Y_CELL_CLICKS * y) 
+              && nMotorEncoder(Y_MOTOR) < 0)
 		{ }
 	}
 
@@ -295,7 +305,8 @@ void pickUpPiece(int x2, int y2)
 {
 	// if we have a king or queen, we need to lower the claw less
 	int lowerDistance = CLAW_LOWER_CLICKS;
-	if (stringFind(board[y2][x2], "K") != -1 || stringFind(board[y2][x2], "Q") != -1)
+	if (stringFind(board[y2][x2], "K") != -1 
+        || stringFind(board[y2][x2], "Q") != -1)
 		lowerDistance = CLAW_LOWER_CLICKS_TALL;
 
 	// make sure the claw is open
@@ -325,13 +336,15 @@ void putDownPiece(int x2, int y2)
 {
 	// change lower distance depending on the peice (king / queen)
 	int lowerDistance = CLAW_LOWER_CLICKS;
-	if (stringFind(board[y2][x2], "K") != -1 || stringFind(board[y2][x2], "Q") != -1)
+	if (stringFind(board[y2][x2], "K") != -1 
+        || stringFind(board[y2][x2], "Q") != -1)
 		lowerDistance = CLAW_LOWER_CLICKS_TALL;
 
 	// lower the claw
 	nMotorEncoder[CLAW_ACTUATION_MOTOR] = 0;
 	motor[CLAW_ACTUATION_MOTOR] = -CLAW_ACTUATION_POWER;
-	while(abs(nMotorEncoder[CLAW_ACTUATION_MOTOR]) < lowerDistance-CLAW_ACTUATION_OFFSET)
+	while(abs(nMotorEncoder[CLAW_ACTUATION_MOTOR]) 
+          < lowerDistance-CLAW_ACTUATION_OFFSET)
 	{ }
 	motor[CLAW_ACTUATION_MOTOR] = 0;
 
@@ -343,7 +356,8 @@ void putDownPiece(int x2, int y2)
 	// raise the claw back up
 	nMotorEncoder[CLAW_ACTUATION_MOTOR] = 0;
 	motor[CLAW_ACTUATION_MOTOR] = CLAW_ACTUATION_POWER;
-	while(abs(nMotorEncoder[CLAW_ACTUATION_MOTOR]) < lowerDistance-CLAW_ACTUATION_OFFSET)
+	while(abs(nMotorEncoder[CLAW_ACTUATION_MOTOR]) 
+          < lowerDistance-CLAW_ACTUATION_OFFSET)
 	{ }
 	motor[CLAW_ACTUATION_MOTOR] = 0;
 }
@@ -513,9 +527,11 @@ task main()
 
 		// display how much time the user has left
 		if (whiteTurn)
-			displayBigTextLine(7,"Time Left:%d:%d", whiteTime / 60, whiteTime % 60);
+			displayBigTextLine(7,"Time Left:%d:%d", whiteTime / 60, 
+                               whiteTime % 60);
 		else
-			displayBigTextLine(7,"Time Left:%d:%d", blackTime / 60, blackTime % 60);
+			displayBigTextLine(7,"Time Left:%d:%d", blackTime / 60, 
+                               blackTime % 60);
 
 		// initalize the input variables
 		int x1,y1,x2,y2;
