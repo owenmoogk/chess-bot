@@ -20,13 +20,6 @@
 // include the claw library
 #include "EV3Servo-lib-UW.c"
 
-// the board is 8x8
-const int BOARD_SIZE = 8;
-
-// 2d array with the board location
-// bk, wk, k, q, b, r, p, n for knight
-string board[BOARD_SIZE][BOARD_SIZE];
-
 // HUGE ASSUMPTION:
 // on startup, the y-axis (pulley) MUST be at the same point (probably zero)
 // otherwise we have to change the init function, I don't think we'll have a touch sensor there to 'zero'
@@ -36,13 +29,19 @@ const int TOUCH = S4;
 const int COLOR = S3;
 const int XZEROTOUCH = S2;
 const int RED = colorRed;
+const int SENSORWAITTIME = 50; // ms
 
 // motor constants
 const int XMOTOR = motorD;
+const int XMOTORPOWER = 30;
+const int XAXISOFFSET = 250; // ms
+const int X_H_OFFSET = 150; // ms, offset error in the 'h' cell
+const int CAPTUREWAITTIME = 900; // ms
+
 const int YMOTOR = motorA;
-const int XMOTORPOWER = 20;
 const int YMOTORPOWER = 100;
 const int YCELLCLICKS = 1175;
+const int YENCODEROFFSET = 110; // mss
 
 // claw constants
 const int CLAWACTUATIONMOTOR = motorB;
@@ -52,21 +51,35 @@ const int CLAWOPEN = 70;
 const int CLAWWAITTIME = 500;
 const int CLAWLOWERCLICKS = 280;
 const int CLAWLOWERCLICKSTALL = 185;
+const int CLAWACTUATIONPOWER = 10;
+const int CLAWACTUATIONOFFSET = 30;
 const int SV_GRIPPER = 4;
+
+// display constants
+const int ASCIISTART = 65;
+const int ASCIIEND = 72;
 
 // where the taken peices go
 const int ENDX = 7;
 const int ENDY = 0;
 
+// the board is 8x8
+const int BOARD_SIZE = 8;
+const int CHESSCLOCKINIT = 300; // seconds
+
+// 2d array with the board location
+// bk, wk, k, q, b, r, p, n for knight
+string board[BOARD_SIZE][BOARD_SIZE];
+
 // sensor configuration
 void configureSensors()
 {
 	SensorType[TOUCH] = sensorEV3_Touch;
-	wait1Msec(50);
+	wait1Msec(SENSORWAITTIME);
 	SensorType[COLOR] = sensorEV3_Color;
-	wait1Msec(50);
+	wait1Msec(SENSORWAITTIME);
 	SensorMode[COLOR] = modeEV3Color_Color;
-	wait1Msec(50);
+	wait1Msec(SENSORWAITTIME);
 	nMotorEncoder[YMOTOR] = 0;
 }
 
@@ -109,13 +122,13 @@ void getCellInput(int &currentLetter, int &currentNumber, bool firstLine)
 		// wrapping around the board
 		// ie, if you start at 1 and hit back, it will go to position 8
 		// this makes it easier, instead of scrolling through everything
-		if (currentLetter < 65)
-			currentLetter = 72;
-		if (currentLetter > 72)
-			currentLetter = 65;
+		if (currentLetter < ASCIISTART)
+			currentLetter = ASCIIEND;
+		if (currentLetter > ASCIIEND)
+			currentLetter = ASCIISTART;
 		if (currentNumber < 1)
-			currentNumber = 8;
-		if (currentNumber > 8)
+			currentNumber = BOARD_SIZE;
+		if (currentNumber > BOARD_SIZE)
 			currentNumber = 1;
 	}
 }
@@ -162,9 +175,9 @@ bool getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &mo
 		return false;
 
 	// letter stored in ascii, number stored as int
-	currentLetter = 65;
+	currentLetter = ASCIISTART;
 	currentNumber = 1;
-	moveToLetter = 65;
+	moveToLetter = ASCIISTART;
 	moveToNumber = 1;
 
 	// get the input for both the current and destination cells
@@ -173,14 +186,14 @@ bool getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &mo
 
 	// after we get the input, we need to rectify the numbers
 	// so that they can be used as indicies of the array
-	currentLetter -= 65;
-	moveToLetter -= 65;
+	currentLetter -= ASCIISTART;
+	moveToLetter -= ASCIISTART;
 	currentNumber -= 1;
 	moveToNumber -= 1;
 
 	// we also need to transpose this so it corresponds correctly with the board
-	currentLetter = 7-currentLetter;
-	moveToLetter = 7-moveToLetter;
+	currentLetter = (BOARD_SIZE-1)-currentLetter;
+	moveToLetter = (BOARD_SIZE-1)-moveToLetter;
 
 	eraseDisplay();
 	return true;
@@ -190,13 +203,13 @@ bool getInput(int &currentLetter, int &currentNumber, int &moveToLetter, int &mo
 void zero()
 {
 	// zero the x axis (until the touch sensor is triggered)
-	motor[XMOTOR] = -30;
+	motor[XMOTOR] = XMOTORPOWER;
 	while (!SensorValue[XZEROTOUCH])
 	{	}
 	motor[XMOTOR] = 0;
 
 	// zeroing the y axis (until motor encoder is 0)
-	motor[YMOTOR] = 100;
+	motor[YMOTOR] = YMOTORPOWER;
 	while (nMotorEncoder[YMOTOR] < 0)
 	{ }
 	motor[YMOTOR] = 0;
@@ -244,7 +257,7 @@ void moveToCell(int currX, int currY, int x, int y, bool firstMove)
 		}
 
 		// this is tuned for color sensor positioning, need to delay to center
-		wait1Msec(250);
+		wait1Msec(XAXISOFFSET);
 		// turn off the motor
 		motor[XMOTOR] = 0;
 	}
@@ -252,15 +265,14 @@ void moveToCell(int currX, int currY, int x, int y, bool firstMove)
 	// if we are not moving in the X, and it is picking up the peice, we need to offset the hardware
 	else if (firstMove)
 	{
-		motor[XMOTOR] = 30;
-		wait1Msec(150);
+		motor[XMOTOR] = XMOTORPOWER;
+		wait1Msec(X_H_OFFSET);
 		motor[XMOTOR] = 0;
 	}
 
-	// reload
 	// move the y axis forward slightly to prevent motor encoder errors
-	motor[YMOTOR] = -100;
-	wait1Msec(110);
+	motor[YMOTOR] = -YMOTORPOWER;
+	wait1Msec(YENCODEROFFSET);
 
 	// move the motor encoder to the correct location
 	motor[YMOTOR] = YMOTORPOWER * directionY;
@@ -291,7 +303,7 @@ void pickUpPiece(int x2, int y2)
 
 	// lower the claw
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWACTUATIONMOTOR] = -10;
+	motor[CLAWACTUATIONMOTOR] = -CLAWACTUATIONPOWER;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
@@ -302,7 +314,7 @@ void pickUpPiece(int x2, int y2)
 
 	// raise the claw back up
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWACTUATIONMOTOR] = 10;
+	motor[CLAWACTUATIONMOTOR] = CLAWACTUATIONPOWER;
 	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
@@ -318,8 +330,8 @@ void putDownPiece(int x2, int y2)
 
 	// lower the claw
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWACTUATIONMOTOR] = -10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-30)
+	motor[CLAWACTUATIONMOTOR] = -CLAWACTUATIONPOWER;
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-CLAWACTUATIONOFFSET)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 
@@ -330,8 +342,8 @@ void putDownPiece(int x2, int y2)
 
 	// raise the claw back up
 	nMotorEncoder[CLAWACTUATIONMOTOR] = 0;
-	motor[CLAWACTUATIONMOTOR] = 10;
-	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-30)
+	motor[CLAWACTUATIONMOTOR] = CLAWACTUATIONPOWER;
+	while(abs(nMotorEncoder[CLAWACTUATIONMOTOR]) < lowerDistance-CLAWACTUATIONOFFSET)
 	{ }
 	motor[CLAWACTUATIONMOTOR] = 0;
 }
@@ -349,8 +361,8 @@ void capturePiece(int x2, int y2)
 	moveToCell(x2,y2,ENDX,ENDY, false);
 
 	// drive a bit further, off the board
-	motor[XMOTOR] = 30;
-	wait1Msec(900);
+	motor[XMOTOR] = XMOTORPOWER;
+	wait1Msec(CAPTUREWAITTIME);
 	motor[XMOTOR] = 0;
 
 	// put the piece back down
@@ -485,8 +497,8 @@ task main()
 	boardInitState();
 
 	// chess timers, seconds left
-	int whiteTime = 300;
-	int blackTime = 300;
+	int whiteTime = CHESSCLOCKINIT;
+	int blackTime = CHESSCLOCKINIT;
 
 	// keep track of the players turn
 	bool whiteTurn = true;
@@ -513,9 +525,9 @@ task main()
 
 		// update the chess clock
 		if (whiteTurn)
-			whiteTime -= time1[T1] /1000;
+			whiteTime -= time1[T1] / 1000;
 		else
-			blackTime -= time1[T1] /1000;
+			blackTime -= time1[T1] / 1000;
 
 		// if the user is out of time, go to shut down procedure
 		if (whiteTime == 0 || blackTime == 0)
